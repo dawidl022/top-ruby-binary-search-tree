@@ -143,6 +143,64 @@ class Tree
     elements
   end
 
+  def inorder(root = @root, traversed = [], &block)
+    return if root.nil?
+
+    inorder(root.left, traversed, &block)
+
+    yield(root.data) if block_given?
+    traversed << root.data
+
+    inorder(root.right, traversed, &block)
+
+    traversed
+  end
+
+  def preorder(root = @root, traversed = [], &block)
+    return if root.nil?
+
+    yield(root.data) if block_given?
+    traversed << root.data
+
+    preorder(root.left, traversed, &block)
+    preorder(root.right, traversed, &block)
+
+    traversed
+  end
+
+  def postorder(root = @root, traversed = [], &block)
+    return if root.nil?
+
+    postorder(root.left, traversed, &block)
+    postorder(root.right, traversed, &block)
+
+    yield(root.data) if block_given?
+    traversed << root.data
+
+    traversed
+  end
+
+  def height(root = @root)
+    return 0 if root.nil? || (root.left.nil? && root.right.nil?)
+
+    [height(root.left), height(root.right)].max + 1
+  end
+
+  def depth(node)
+    height - height(node)
+  end
+
+  def balanced?(root = @root)
+    return true if root.nil?
+
+    balanced?(root.left) && balanced?(root.right) &&
+    (height(root.left) - height(root.right)).abs <= 1
+  end
+
+  def rebalance
+    @root = build_tree(inorder)
+  end
+
   private
 
   # @param [Array] array that is sorted and has duplicates removed

@@ -162,13 +162,6 @@ RSpec.describe Tree do
       let(:tree) { described_class.new(array) }
 
       it "returns the elements in level order" do
-      #        8
-      #     /     \
-      #    4      67
-      #   / \    / \
-      #  1   5  9  324
-      #  \   \  \    \
-      #  3   7  23  6345
         expected = [8, 4, 67, 1, 5, 9, 324, 3, 7, 23, 6345]
         expect(tree.level_order).to eq(expected)
       end
@@ -180,6 +173,136 @@ RSpec.describe Tree do
         tree.level_order { |value| target << value * 2 }
         expect(target).to eq(expected)
       end
+    end
+  end
+
+  describe "#inorder" do
+    it "doesn't yield if tree is empty" do
+      tree.inorder { raise "Yielded" }
+    end
+
+    describe "populated with elements" do
+      let(:array) { [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324] }
+      let(:tree) { described_class.new(array) }
+
+      it "returns the elements in order" do
+        expected = [1, 3, 4, 5, 7, 8, 9, 23, 67, 324, 6345]
+        expect(tree.inorder).to eq(expected)
+      end
+
+      it "yields each element to a block" do
+        expected = [1, 3, 4, 5, 7, 8, 9, 23, 67, 324, 6345].map {|x| x * 2}
+        target = []
+
+        tree.inorder { |value| target << value * 2 }
+        expect(target).to eq(expected)
+      end
+    end
+  end
+
+  describe "#preorder" do
+    it "doesn't yield if tree is empty" do
+      tree.preorder { raise "Yielded" }
+    end
+
+    describe "populated with elements" do
+      let(:array) { [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324] }
+      let(:tree) { described_class.new(array) }
+
+      it "returns the elements in order" do
+        expected = [8, 4, 1, 3, 5, 7, 67, 9, 23, 324, 6345]
+        expect(tree.preorder).to eq(expected)
+      end
+
+      it "yields each element to a block" do
+        expected = [8, 4, 1, 3, 5, 7, 67, 9, 23, 324, 6345].map {|x| x * 2}
+        target = []
+
+        tree.preorder { |value| target << value * 2 }
+        expect(target).to eq(expected)
+      end
+    end
+  end
+
+  describe "#postorder" do
+    it "doesn't yield if tree is empty" do
+      tree.postorder { raise "Yielded" }
+    end
+
+    describe "populated with elements" do
+      let(:array) { [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324] }
+      let(:tree) { described_class.new(array) }
+
+      it "returns the elements in order" do
+        expected = [3, 1, 7, 5, 4, 23, 9, 6345, 324, 67, 8]
+        expect(tree.postorder).to eq(expected)
+      end
+
+      it "yields each element to a block" do
+        expected = [3, 1, 7, 5, 4, 23, 9, 6345, 324, 67, 8].map {|x| x * 2}
+        target = []
+
+        tree.postorder { |value| target << value * 2 }
+        expect(target).to eq(expected)
+      end
+    end
+  end
+
+  describe "#height" do
+    let(:array) { [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324] }
+    let(:tree) { described_class.new(array) }
+
+    it "returns height of tree when given no arguments" do
+      expect(tree.height).to eq(3)
+    end
+
+    it "returns height of a subtree" do
+      expect(tree.height(tree.find(4))).to eq(2)
+    end
+  end
+
+  describe "#depth" do
+    let(:array) { [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324] }
+    let(:tree) { described_class.new(array) }
+
+    it "returns depth of root" do
+      expect(tree.depth(tree.root)).to eq(0)
+    end
+
+    it "returns depth of node" do
+      expect(tree.depth(tree.find(4))).to eq(1)
+    end
+
+    it "returns depth of leaf" do
+      expect(tree.depth(tree.find(3))).to eq(3)
+    end
+  end
+
+  describe "#balanced?" do
+    let(:array) { [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324] }
+    let(:tree) { described_class.new(array) }
+
+    it "returns true for balanced tree" do
+      expect(tree.balanced?).to be true
+    end
+
+    it "returns false for an unbalanced tree" do
+      tree.insert(10009)
+      tree.insert(10010)
+      expect(tree.balanced?).to be false
+    end
+  end
+
+  describe "rebalance" do
+    let(:array) { [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324] }
+    let(:tree) { described_class.new(array) }
+
+    it "rebalances an unbalanced tree" do
+      tree.insert(10009)
+      tree.insert(10010)
+
+      tree.rebalance
+      expect(tree.balanced?).to be true
     end
   end
 end
