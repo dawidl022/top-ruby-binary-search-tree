@@ -16,6 +16,28 @@ class Node
   end
 end
 
+class Queue
+  def initialize(array = [])
+    @queue = array
+  end
+
+  def enqueue(element)
+    @queue << element
+  end
+
+  def dequeue
+    @queue.shift
+  end
+
+  def empty?
+    @queue.empty?
+  end
+
+  def size
+    @queue.length
+  end
+end
+
 class Tree
   attr_reader :root
 
@@ -91,6 +113,34 @@ class Tree
     end
 
     current
+  end
+
+  def find(value)
+    current = @root
+    while !current.nil? && current.data != value
+      if value < current.data
+        current = current.left
+      else
+        current = current.right
+      end
+    end
+    current
+  end
+
+  def level_order
+    return if @root.nil?
+    queue = Queue.new([@root])
+    elements = []
+
+    while !queue.empty?
+      current = queue.dequeue
+      yield(current.data) if block_given?
+      elements << current.data
+
+      queue.enqueue(current.left) if current.left
+      queue.enqueue(current.right) if current.right
+    end
+    elements
   end
 
   private

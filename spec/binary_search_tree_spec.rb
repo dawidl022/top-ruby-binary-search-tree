@@ -134,4 +134,52 @@ RSpec.describe Tree do
       expect(tree.delete(2)).to be nil
     end
   end
+
+  describe "#find" do
+    let(:array) { [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324] }
+    let(:tree) { described_class.new(array) }
+
+    it "returns the root node when appropriate" do
+      expect(tree.find(8).data).to eq(8)
+    end
+
+    it "returns a node with the searched for value" do
+      expect(tree.find(324).data).to eq(324)
+    end
+
+    it "returns nil when element not found" do
+      expect(tree.find(11)).to be nil
+    end
+  end
+
+  describe "#level_order" do
+    it "doesn't yield if tree is empty" do
+      tree.level_order { raise "Yielded" }
+    end
+
+    describe "populated with elements" do
+      let(:array) { [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324] }
+      let(:tree) { described_class.new(array) }
+
+      it "returns the elements in level order" do
+      #        8
+      #     /     \
+      #    4      67
+      #   / \    / \
+      #  1   5  9  324
+      #  \   \  \    \
+      #  3   7  23  6345
+        expected = [8, 4, 67, 1, 5, 9, 324, 3, 7, 23, 6345]
+        expect(tree.level_order).to eq(expected)
+      end
+
+      it "yields each element to a block" do
+        expected = [8, 4, 67, 1, 5, 9, 324, 3, 7, 23, 6345].map {|x| x * 2}
+        target = []
+
+        tree.level_order { |value| target << value * 2 }
+        expect(target).to eq(expected)
+      end
+    end
+  end
 end
